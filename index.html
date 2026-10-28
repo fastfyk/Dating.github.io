@@ -3,31 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>تطبيق المواعدة والزواج - نيالا</title>
+  <title>المواعدة والزواج نيالا♥️ا ♥️</title>
   
-  <!-- Tailwind CSS & FontAwesome -->
+  <!-- Tailwind CSS & FontAwesome & Google Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase Web SDK (v9 Compatibility) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
-
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#fff1f2',
-              100: '#ffe4e6',
-              500: '#e11d48',
-              600: '#e11d48',
-              700: '#be123c',
+            nyala: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#16a34a',
+              600: '#15803d',
+              700: '#166534',
             }
           },
           fontFamily: {
@@ -38,306 +31,696 @@
     }
   </script>
 
+  <!-- Firebase Web SDK v9 Compatibility -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
+      user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .hide-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+<body class="bg-gray-100 text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
 
-  <!-- App Header -->
-  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between shadow-sm">
-    <div class="flex items-center gap-2">
-      <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500 to-pink-600 flex items-center justify-center text-white shadow-md">
-        <i class="fa-solid font-bold fa-heart text-lg"></i>
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center z-10 shadow-sm">
+    <div class="flex items-center space-x-2 space-x-reverse">
+      <div class="w-10 h-10 bg-nyala-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow">
+        <i class="fa-solid fa-city"></i>
       </div>
       <div>
-        <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">زواج نيالا</h1>
-        <p class="text-xs text-rose-500 font-medium">تواصل شرعي وثقافي راقٍ</p>
+        <h1 class="text-lg font-bold text-gray-900 leading-tight">تطبيق نيالا</h1>
+        <p class="text-xs text-nyala-600 font-medium"><i class="fa-solid fa-location-dot"></i> نبض مجتمع نيالا</p>
       </div>
     </div>
-    
-    <div class="flex items-center gap-2">
-      <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-2.5 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-        <i class="fa-solid fa-moon text-lg dark:hidden"></i>
-        <i class="fa-solid fa-sun text-lg hidden dark:block text-amber-400"></i>
-      </button>
-      <button onclick="showSection('profile')" class="relative">
-        <img id="headerAvatar" src="https://ui-avatars.com/api/?name=User&background=e11d48&color=fff" alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-rose-500">
+    <div id="authBtnContainer">
+      <button onclick="openAuthModal()" class="bg-nyala-500 hover:bg-nyala-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+        دخول / تسجيل
       </button>
     </div>
   </header>
 
   <!-- Main Content Area -->
-  <main class="flex-1 max-w-md w-full mx-auto p-4 pb-24 overflow-y-auto hide-scrollbar">
-
-    <!-- Section: Discover / Cards -->
-    <section id="discoverSection" class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-white">اكتشف شريك حياتك في نيالا</h2>
-        <span class="text-xs bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 px-2.5 py-1 rounded-full font-semibold">
-          <i class="fa-solid fa-location-dot ml-1"></i>نيالا وحولها
-        </span>
+  <main class="flex-1 overflow-y-auto hide-scrollbar p-4 relative pb-24" id="mainContainer">
+    
+    <!-- Tab 1: Explore / Profiles & Posts (استكشف ماذا يحدث في نيالا) -->
+    <div id="tab-explore" class="space-y-4">
+      <div class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-2">
+        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+        <input type="text" id="searchInput" onkeyup="filterProfiles()" placeholder="ابحث في منشورات وأحياء نيالا..." class="w-full text-sm outline-none bg-transparent">
       </div>
 
-      <!-- User Card Sample -->
-      <div id="cardContainer" class="relative bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-700 transition">
-        <div class="relative h-96 w-full bg-slate-200 dark:bg-slate-700">
-          <img id="cardImage" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800" alt="User" class="w-full h-full object-cover">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          
-          <div class="absolute bottom-4 right-4 left-4 text-white">
-            <div class="flex items-center gap-2">
-              <h3 id="cardName" class="text-2xl font-bold">أميرة أحمد</h3>
-              <span id="cardAge" class="text-xl opacity-90">24</span>
-              <i class="fa-solid fa-circle-check text-sky-400 text-sm" title="حساب موثق"></i>
-            </div>
-            <p id="cardCity" class="text-xs opacity-80 mt-1"><i class="fa-solid fa-location-dot ml-1"></i>حي المطار، نيالا</p>
-            <p id="cardBio" class="text-sm mt-2 line-clamp-2 text-slate-200">خريجة جامعة نيالا، أبحث عن شريك حياة يخاف الله، طموح ومحترم للتفاهم وبناء أسرة كريمة.</p>
-          </div>
-        </div>
-
-        <div class="p-4 bg-white dark:bg-slate-800 flex items-center justify-evenly border-t border-slate-100 dark:border-slate-700">
-          <button onclick="handleDislike()" class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 flex items-center justify-center text-xl shadow-md transition active:scale-95">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-          <button onclick="handleLike()" class="w-16 h-16 rounded-full bg-gradient-to-tr from-rose-500 to-pink-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-rose-500/30 hover:scale-105 transition active:scale-95">
-            <i class="fa-solid fa-heart"></i>
-          </button>
-          <button onclick="openChatModal()" class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/50 flex items-center justify-center text-xl shadow-md transition active:scale-95">
-            <i class="fa-solid fa-comment-dots"></i>
-          </button>
+      <!-- قسم استكشف ماذا يحدث في نيالا (المنشورات) -->
+      <div class="space-y-3">
+        <h2 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-earth-africa text-nyala-500"></i> استكشف ماذا يحدث في نيالا</h2>
+        <div id="nyalaPostsFeed" class="space-y-4">
+          <!-- يتم جلب المنشورات ديناميكياً هنا -->
         </div>
       </div>
-    </section>
 
-    <!-- Section: Messages / Chat -->
-    <section id="messagesSection" class="hidden space-y-3">
-      <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-2">المحادثات والاهتمامات</h2>
-      
-      <div class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
-        <!-- Chat Item -->
-        <div onclick="openChatModal('أميرة أحمد')" class="p-3.5 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" class="w-12 h-12 rounded-full object-cover">
-            <span class="w-3 h-3 bg-emerald-500 rounded-full absolute bottom-0 right-0 ring-2 ring-white dark:ring-slate-800"></span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <h4 class="font-bold text-slate-900 dark:text-white truncate">أميرة أحمد</h4>
-              <span class="text-xs text-slate-400">10:45 ص</span>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">السلام عليكم، أهلاً بك...</p>
-          </div>
-        </div>
-
-        <!-- Chat Item -->
-        <div onclick="openChatModal('عمر عثمان')" class="p-3.5 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" class="w-12 h-12 rounded-full object-cover">
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between">
-              <h4 class="font-bold text-slate-900 dark:text-white truncate">عمر عثمان</h4>
-              <span class="text-xs text-slate-400">أمس</span>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">تم إرسال طلباً للاهتمام بالتواصل</p>
-          </div>
+      <div class="pt-2">
+        <h3 class="font-bold text-gray-800 text-sm mb-2"><i class="fa-solid fa-users text-nyala-500"></i> أعضاء تطبيق نيالا</h3>
+        <div id="profilesGrid" class="grid grid-cols-2 gap-3">
+          <!-- يتم جلب الملفات الشخصية هنا ديناميكياً -->
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Section: Profile Setting -->
-    <section id="profileSection" class="hidden space-y-4">
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm text-center">
-        <div class="relative w-24 h-24 mx-auto mb-3">
-          <img id="profileImagePreview" src="https://ui-avatars.com/api/?name=محمود&background=e11d48&color=fff" class="w-full h-full rounded-full object-cover ring-4 ring-rose-500/20">
-          <label for="avatarUpload" class="absolute bottom-0 right-0 w-8 h-8 bg-rose-600 text-white rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-rose-700 transition">
-            <i class="fa-solid fa-camera text-xs"></i>
-          </label>
-          <input type="file" id="avatarUpload" class="hidden" accept="image/*" onchange="previewAvatar(event)">
-        </div>
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white">محمود عصام الدين</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">نيالا، حي الوادي</p>
+    <!-- Tab 2: Live Streams Rooms -->
+    <div id="tab-live" class="hidden space-y-4">
+      <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm">
+        <h2 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-broadcast-tower text-red-500 animate-pulse"></i> غرف البث المباشر</h2>
+        <button onclick="openCreateLiveModal()" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 shadow">
+          <i class="fa-solid fa-video"></i> افتح لايف الآن
+        </button>
       </div>
+      <div id="liveStreamsGrid" class="grid grid-cols-1 gap-3">
+        <!-- قاعات البث المباشر -->
+      </div>
+    </div>
 
-      <form id="profileForm" onsubmit="saveProfile(event)" class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm space-y-3">
-        <h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm border-b dark:border-slate-700 pb-2">بيانات الحساب والتعارف</h4>
+    <!-- Tab 3: Video Match & Video Chat -->
+    <div id="tab-video" class="hidden space-y-4 text-center">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+        <div class="w-24 h-24 bg-nyala-50 text-nyala-500 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner animate-bounce">
+          <i class="fa-solid fa-video"></i>
+        </div>
+        <h2 class="text-lg font-bold text-gray-800">التطابق والدردشة المرئية الفورية</h2>
+        <p class="text-xs text-gray-500 max-w-xs mx-auto">تواصل مباشرة وجهاً لوجه عبر الفيديو مع أشخاص متصلين الآن في أحياء نيالا المختلفة.</p>
         
+        <div id="videoMatchArea" class="hidden relative rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center">
+          <video id="remoteVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+          <video id="localVideo" autoplay muted playsinline class="absolute bottom-3 left-3 w-24 h-32 object-cover rounded-lg border-2 border-white shadow-lg"></video>
+        </div>
+
+        <button onclick="startVideoMatch()" id="matchBtn" class="w-full bg-nyala-500 hover:bg-nyala-600 text-white font-bold py-3 rounded-xl text-sm shadow transition">
+          <i class="fa-solid fa-shuffle"></i> ابدأ التطابق المرئي الآن
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab 4: Messages -->
+    <div id="tab-messages" class="hidden space-y-3">
+      <h2 class="font-bold text-gray-800 text-base mb-2">المحادثات الخاصة</h2>
+      <div id="conversationsList" class="space-y-2">
+        <p class="text-xs text-gray-400 text-center py-6">اختر شخصاً من قسم الاستكشف لبدء محادثة فورية</p>
+      </div>
+    </div>
+
+    <!-- Tab 5: My Profile (مع إضافة خاصية نشر المنشورات) -->
+    <div id="tab-profile" class="hidden space-y-4">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3 text-center">
+        <div class="w-20 h-20 rounded-full bg-nyala-500 text-white flex items-center justify-center text-3xl font-bold mx-auto shadow" id="myAvatarLetter">ن</div>
+        <h3 id="myProfileName" class="font-bold text-lg text-gray-800">زائر</h3>
+        <p id="myProfileNeighborhood" class="text-xs text-nyala-600 font-medium"></p>
+        <button onclick="logout()" class="w-full bg-gray-100 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-200">تسجيل الخروج</button>
+      </div>
+
+      <!-- نموذج إضافة منشور جديد (صور/فيديو) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
+        <h3 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-pen-to-square text-nyala-500"></i> نشر منشور جديد في نيالا</h3>
+        <textarea id="newPostText" placeholder="ما الذي يحدث في حيك اليوم؟" class="w-full border rounded-lg p-3 text-sm outline-none focus:border-nyala-500 h-20 resize-none"></textarea>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">الاسم بالكامل</label>
-          <input type="text" id="inputName" value="محمود عصام الدين" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
+          <label class="block text-xs font-medium text-gray-600 mb-1">رابط صورة أو مقطع فيديو (مباشر أو يوتيوب/رابط خارجي):</label>
+          <input type="text" id="newPostMediaUrl" placeholder="https://example.com/media.jpg أو mp4" class="w-full border rounded-lg p-2.5 text-xs outline-none focus:border-nyala-500">
         </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">العمر</label>
-            <input type="number" id="inputAge" value="26" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">المنطقة في نيالا</label>
-            <input type="text" id="inputDistrict" value="حي الوادي" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
-          </div>
-        </div>
-
         <div>
-          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">نبذة شخصية والهدف من التواصل</label>
-          <textarea id="inputBio" rows="3" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500">مهندس ومصمم برمجيات، أبحث عن شريكة حياة مخلصة للتفاهم الجاد والزواج الشرعي.</textarea>
+          <label class="block text-xs font-medium text-gray-600 mb-1">نوع الوسائط:</label>
+          <select id="newPostMediaType" class="w-full border rounded-lg p-2.5 text-xs outline-none bg-white">
+            <option value="none">بدون وسائط (نص فقط)</option>
+            <option value="image">صورة</option>
+            <option value="video">مقطع فيديو</option>
+          </select>
         </div>
-
-        <button type="submit" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold shadow-md transition">حفظ التغييرات</button>
-      </form>
-    </section>
+        <button onclick="createPost()" class="w-full bg-nyala-500 hover:bg-nyala-600 text-white font-bold py-2.5 rounded-lg text-sm shadow">نشر الآن</button>
+      </div>
+    </div>
 
   </main>
 
-  <!-- Bottom Navigation Bar -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 py-2 px-6 flex justify-around items-center z-40 max-w-md mx-auto">
-    <button onclick="showSection('discover')" id="navDiscover" class="flex flex-col items-center gap-1 text-rose-600 dark:text-rose-500">
-      <i class="fa-solid fa-compass text-xl"></i>
-      <span class="text-[10px] font-bold">استكشاف</span>
-    </button>
-    <button onclick="showSection('messages')" id="navMessages" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-      <i class="fa-solid fa-comments text-xl"></i>
-      <span class="text-[10px] font-bold">الرسائل</span>
-    </button>
-    <button onclick="showSection('profile')" id="navProfile" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-      <i class="fa-solid fa-user text-xl"></i>
-      <span class="text-[10px] font-bold">الملف الشخصي</span>
-    </button>
-  </nav>
-
-  <!-- Chat Modal -->
-  <div id="chatModal" class="fixed inset-0 bg-black/60 z-50 hidden flex flex-col justify-end">
-    <div class="bg-white dark:bg-slate-800 w-full max-w-md mx-auto h-[85vh] rounded-t-3xl flex flex-col overflow-hidden shadow-2xl">
-      <!-- Chat Header -->
-      <div class="p-4 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img id="chatPartnerImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" class="w-10 h-10 rounded-full object-cover">
-          <div>
-            <h3 id="chatPartnerName" class="font-bold text-slate-900 dark:text-white text-sm">أميرة أحمد</h3>
-            <p class="text-[10px] text-emerald-500 font-semibold"><i class="fa-solid fa-circle text-[8px] ml-1"></i>متصل الآن</p>
-          </div>
-        </div>
-        <button onclick="closeChatModal()" class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-200 flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <!-- Messages Stream -->
-      <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-100/50 dark:bg-slate-900/50 text-sm">
-        <div class="flex justify-start">
-          <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
-            السلام عليكم، مرحباً بك في تطبيق زواج نيالا.
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <div class="bg-rose-600 text-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
-            وعليكم السلام والرحمة، تشرفت بالتواصل معك.
-          </div>
+  <!-- Chat Room Modal -->
+  <div id="chatModal" class="fixed inset-0 bg-white z-50 flex flex-col hidden">
+    <div class="bg-white border-b px-4 py-3 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-3">
+        <button onclick="closeChatModal()" class="text-gray-600 text-lg p-1"><i class="fa-solid fa-arrow-right"></i></button>
+        <div>
+          <h3 id="chatTargetName" class="font-bold text-sm text-gray-800">محادثة</h3>
+          <span class="text-[10px] text-green-500 font-medium">متواجد الآن</span>
         </div>
       </div>
-
-      <!-- Input Bar -->
-      <form onsubmit="sendChatMessage(event)" class="p-3 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex items-center gap-2">
-        <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 px-4 py-2.5 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-rose-500">
-        <button type="submit" class="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-md hover:bg-rose-700 transition">
-          <i class="fa-solid fa-paper-plane text-sm"></i>
-        </button>
-      </form>
+    </div>
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"></div>
+    <div class="p-3 bg-white border-t flex items-center gap-2">
+      <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 border rounded-full px-4 py-2 text-sm outline-none focus:border-nyala-500">
+      <button onclick="sendMessage()" class="bg-nyala-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow"><i class="fa-solid fa-paper-plane text-sm"></i></button>
     </div>
   </div>
 
+  <!-- Comments Modal -->
+  <div id="commentsModal" class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center hidden">
+    <div class="bg-white rounded-t-2xl w-full max-w-lg h-[75vh] flex flex-col p-4 shadow-xl">
+      <div class="flex justify-between items-center border-b pb-2 mb-2">
+        <h3 class="font-bold text-gray-800 text-sm">التعليقات والردود</h3>
+        <button onclick="closeCommentsModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="commentsListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1">
+        <!-- يتم جلب التعليقات هنا -->
+      </div>
+      <div class="pt-2 border-t flex items-center gap-2">
+        <input type="text" id="commentInputText" placeholder="اكتب تعليقاً..." class="flex-1 border rounded-full px-4 py-2 text-xs outline-none focus:border-nyala-500">
+        <button onclick="sendComment()" class="bg-nyala-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow">تعليق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal (Username & Password Only) -->
+  <div id="authModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 relative">
+      <button onclick="closeAuthModal()" class="absolute top-3 left-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <h3 class="text-lg font-bold text-center text-gray-800">التسجيل في تطبيق نيالا</h3>
+      <p class="text-[11px] text-gray-500 text-center">أدخل اسم المستخدم وكلمة المرور فقط لتظهر بياناتك لجميع أهل نيالا فوراً!</p>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">اسم المستخدم</label>
+          <input type="text" id="authUsername" placeholder="مثال: عثمان_نيالا" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-1 focus:ring-nyala-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">كلمة المرور</label>
+          <input type="password" id="authPassword" placeholder="كلمة المرور" class="w-full border rounded-lg p-2.5 text-sm outline-none focus:ring-1 focus:ring-nyala-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">اختر الحي الخاص بك</label>
+          <select id="authNeighborhood" class="w-full border rounded-lg p-2.5 text-sm outline-none bg-white">
+            <option value="حي الوحدة">حي الوحدة</option>
+            <option value="حي الجير">حي الجير</option>
+            <option value="حي المطار">حي المطار</option>
+            <option value="حي الرياض">حي الرياض</option>
+            <option value="حي النهضة">حي النهضة</option>
+            <option value="حي السينما">حي السينما</option>
+            <option value="حي التضامن">حي التضامن</option>
+            <option value="طيبة النيل">طيبة النيل</option>
+            <option value="حي دريج">حي دريج</option>
+            <option value="السد العالي">السد العالي</option>
+            <option value="حي الكنغو">حي الكنغو</option>
+            <option value="حي السلام">حي السلام</option>
+            <option value="حي رايق">حي رايق</option>
+            <option value="خرطوم بليل">خرطوم بليل</option>
+            <option value="السكة حديد">السكة حديد</option>
+          </select>
+        </div>
+        <button onclick="handleAuth()" class="w-full bg-nyala-500 text-white font-bold py-2.5 rounded-lg text-sm hover:bg-nyala-600 shadow">دخول / تسجيل فوري</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Live Stream Modal -->
+  <div id="createLiveModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4">
+      <h3 class="text-lg font-bold text-gray-800">فتح غرفة بث مباشر</h3>
+      <input type="text" id="liveTitleInput" placeholder="عنوان البث (مثال: نقاشات شباب أحياء نيالا)" class="w-full border rounded-lg p-2.5 text-sm outline-none">
+      <div class="flex gap-2">
+        <button onclick="createLiveStream()" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg text-sm">بدء البث الآن</button>
+        <button onclick="document.getElementById('createLiveModal').classList.add('hidden')" class="flex-1 bg-gray-100 text-gray-600 font-bold py-2 rounded-lg text-sm">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 h-16 flex justify-around items-center z-10">
+    <button onclick="switchTab('explore')" id="nav-explore" class="flex flex-col items-center gap-1 text-nyala-500"><i class="fa-solid fa-compass text-base"></i><span class="text-[10px] font-bold">استكشف</span></button>
+    <button onclick="switchTab('live')" id="nav-live" class="flex flex-col items-center gap-1 text-gray-400"><i class="fa-solid fa-broadcast-tower text-base"></i><span class="text-[10px] font-bold">البث</span></button>
+    <button onclick="switchTab('video')" id="nav-video" class="flex flex-col items-center gap-1 text-gray-400"><i class="fa-solid fa-video text-base"></i><span class="text-[10px] font-bold">تطابق فيديو</span></button>
+    <button onclick="switchTab('messages')" id="nav-messages" class="flex flex-col items-center gap-1 text-gray-400"><i class="fa-solid fa-comments text-base"></i><span class="text-[10px] font-bold">الرسائل</span></button>
+    <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 text-gray-400"><i class="fa-solid fa-user text-base"></i><span class="text-[10px] font-bold">حسابي</span></button>
+  </nav>
+
+  <!-- Application Script & Firebase Integration -->
   <script>
-    // Theme Switcher
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
+    // ضع بيانات مشروعك على Firebase هنا
+    const firebaseConfig = {
+      apiKey: "AIzaSyYourApiKeyHere...",
+      authDomain: "nyala-app.firebaseapp.com",
+      projectId: "nyala-app",
+      storageBucket: "nyala-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123:web:abc"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
+    const db = firebase.firestore();
 
-    // Tab Navigation
-    function showSection(sectionName) {
-      document.getElementById('discoverSection').classList.add('hidden');
-      document.getElementById('messagesSection').classList.add('hidden');
-      document.getElementById('profileSection').classList.add('hidden');
+    let currentUser = JSON.parse(localStorage.getItem('nyala_user')) || null;
+    let activePostIdForComment = null;
+    let activeReplyingTo = null; // لتخزين اسم الشخص المراد الرد على تعليقه
 
-      const navButtons = ['navDiscover', 'navMessages', 'navProfile'];
-      navButtons.forEach(id => {
-        const btn = document.getElementById(id);
-        btn.className = "flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200";
+    window.onload = function() {
+      updateAuthUI();
+      loadProfiles();
+      loadLiveStreams();
+      loadNyalaPosts();
+    };
+
+    function switchTab(tabName) {
+      ['explore', 'live', 'video', 'messages', 'profile'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).className = "flex flex-col items-center gap-1 text-gray-400";
       });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      document.getElementById(`nav-${tabName}`).className = "flex flex-col items-center gap-1 text-nyala-500";
+    }
 
-      if(sectionName === 'discover') {
-        document.getElementById('discoverSection').classList.remove('hidden');
-        document.getElementById('navDiscover').className = "flex flex-col items-center gap-1 text-rose-600 dark:text-rose-500";
-      } else if(sectionName === 'messages') {
-        document.getElementById('messagesSection').classList.remove('hidden');
-        document.getElementById('navMessages').className = "flex flex-col items-center gap-1 text-rose-600 dark:text-rose-500";
-      } else if(sectionName === 'profile') {
-        document.getElementById('profileSection').classList.remove('hidden');
-        document.getElementById('navProfile').className = "flex flex-col items-center gap-1 text-rose-600 dark:text-rose-500";
+    function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+    // التسجيل باسم المستخدم وكلمة المرور فقط والحفظ في قاعدة البيانات
+    async function handleAuth() {
+      const usernameInput = document.getElementById('authUsername');
+      const passwordInput = document.getElementById('authPassword');
+      const neighborhoodSelect = document.getElementById('authNeighborhood');
+
+      const username = usernameInput ? usernameInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value.trim() : '';
+      const neighborhood = neighborhoodSelect ? neighborhoodSelect.value : '';
+
+      if (!username || !password) {
+        alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
+        return;
+      }
+
+      const userData = {
+        username: username,
+        password: password,
+        neighborhood: neighborhood,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        const docId = username.replace(/[.#$\/\[\]]/g, "_");
+        await db.collection('nyala_users').doc(docId).set(userData);
+        
+        localStorage.setItem('nyala_user', JSON.stringify(userData));
+        currentUser = userData;
+        closeAuthModal();
+        updateAuthUI();
+        loadProfiles();
+        alert('تم التسجيل بنجاح، وظهر ملفك الشخصي في تطبيق نيالا!');
+      } catch(e) {
+        localStorage.setItem('nyala_user', JSON.stringify(userData));
+        currentUser = userData;
+        closeAuthModal();
+        updateAuthUI();
+        loadProfiles();
+        alert('تم حفظ البيانات محلياً بنجاح!');
       }
     }
 
-    // Like / Dislike Handlers
-    function handleLike() {
-      alert('تم إرسال إعجاب واهتمام للتواصل!');
+    function updateAuthUI() {
+      const btnContainer = document.getElementById('authBtnContainer');
+      if (currentUser) {
+        if(btnContainer) btnContainer.innerHTML = `<span class="text-xs font-bold text-nyala-600"><i class="fa-solid fa-user-check"></i> ${currentUser.username}</span>`;
+        if(document.getElementById('myProfileName')) document.getElementById('myProfileName').innerText = currentUser.username;
+        if(document.getElementById('myProfileNeighborhood')) document.getElementById('myProfileNeighborhood').innerText = `حي ${currentUser.neighborhood} - نيالا`;
+        if(document.getElementById('myAvatarLetter')) document.getElementById('myAvatarLetter').innerText = currentUser.username.charAt(0).toUpperCase();
+      } else {
+        if(btnContainer) btnContainer.innerHTML = `<button onclick="openAuthModal()" class="bg-nyala-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow">دخول / تسجيل</button>`;
+      }
     }
 
-    function handleDislike() {
-      alert('تم التخطي، عرض الملف التالي...');
+    function logout() {
+      localStorage.removeItem('nyala_user');
+      currentUser = null;
+      updateAuthUI();
+      loadProfiles();
+      alert('تم تسجيل الخروج بنجاح');
     }
 
-    // Chat Modal Control
-    function openChatModal(name = 'أميرة أحمد') {
-      document.getElementById('chatPartnerName').innerText = name;
-      document.getElementById('chatModal').classList.remove('hidden');
+    // --- ميزة نشر المنشورات (صور وفيديوهات) ---
+    async function createPost() {
+      if (!currentUser) return alert('يجب تسجيل الدخول أولاً لنشر المنشورات');
+      const text = document.getElementById('newPostText').value.trim();
+      const mediaUrl = document.getElementById('newPostMediaUrl').value.trim();
+      const mediaType = document.getElementById('newPostMediaType').value;
+
+      if (!text && !mediaUrl) return alert('الرجاء كتابة نص المنشور أو إضافة رابط الوسائط');
+
+      const postData = {
+        author: currentUser.username,
+        neighborhood: currentUser.neighborhood,
+        text: text,
+        mediaUrl: mediaUrl,
+        mediaType: mediaType,
+        createdAt: new Date().toISOString(),
+        reactions: {
+          like: [],
+          love: [],
+          angry: [],
+          support: [],
+          sad: []
+        },
+        commentsCount: 0
+      };
+
+      try {
+        await db.collection('nyala_posts').add(postData);
+        document.getElementById('newPostText').value = '';
+        document.getElementById('newPostMediaUrl').value = '';
+        alert('تم نشر منشورك بنجاح في قسم استكشف ماذا يحدث في نيالا!');
+        switchTab('explore');
+      } catch(e) {
+        alert('خطأ أثناء النشر: ' + e.message);
+      }
     }
 
-    function closeChatModal() {
-      document.getElementById('chatModal').classList.add('hidden');
-    }
+    // --- عرض المنشورات وتفاعلاتها وتعليقاتها ---
+    function loadNyalaPosts() {
+      const feed = document.getElementById('nyalaPostsFeed');
+      if (!feed) return;
 
-    function sendChatMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      if(!input.value.trim()) return;
-
-      const chatContainer = document.getElementById('chatMessages');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'flex justify-end';
-      msgDiv.innerHTML = `<div class="bg-rose-600 text-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">${input.value}</div>`;
-      
-      chatContainer.appendChild(msgDiv);
-      input.value = '';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // Avatar Preview
-    function previewAvatar(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('profileImagePreview').src = e.target.result;
-          document.getElementById('headerAvatar').src = e.target.result;
+      db.collection('nyala_posts').onSnapshot(snapshot => {
+        feed.innerHTML = '';
+        if (snapshot.empty) {
+          feed.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">لا توجد منشورات حالياً. كن أول من ينشر في نيالا!</p>';
+          return;
         }
-        reader.readAsDataURL(file);
+
+        snapshot.forEach(docSnap => {
+          const post = docSnap.data();
+          const postId = docSnap.id;
+          const reactions = post.reactions || { like: [], love: [], angry: [], support: [], sad: [] };
+          
+          // حساب إجمالي أعداد المتفاعلين
+          const totalReactions = (reactions.like?.length || 0) + (reactions.love?.length || 0) + (reactions.angry?.length || 0) + (reactions.support?.length || 0) + (reactions.sad?.length || 0);
+
+          let mediaHTML = '';
+          if (post.mediaType === 'image' && post.mediaUrl) {
+            mediaHTML = `<div class="mt-2 rounded-lg overflow-hidden bg-black max-h-60 flex items-center justify-center"><img src="${post.mediaUrl}" class="w-full object-cover"></div>`;
+          } else if (post.mediaType === 'video' && post.mediaUrl) {
+            mediaHTML = `<div class="mt-2 rounded-lg overflow-hidden bg-black aspect-video flex items-center justify-center"><video src="${post.mediaUrl}" controls class="w-full h-full object-cover"></video></div>`;
+          }
+
+          feed.innerHTML += `
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-9 h-9 bg-nyala-500 text-white rounded-full flex items-center justify-center font-bold text-sm">${post.author.charAt(0).toUpperCase()}</div>
+                  <div>
+                    <h4 class="font-bold text-xs text-gray-800">${post.author}</h4>
+                    <span class="text-[10px] text-nyala-600"><i class="fa-solid fa-location-dot"></i> حي ${post.neighborhood}</span>
+                  </div>
+                </div>
+              </div>
+
+              ${post.text ? `<p class="text-xs text-gray-700 leading-relaxed">${post.text}</p>` : ''}
+              ${mediaHTML}
+
+              <!-- تفاعل أعداد المتفاعلين -->
+              <div class="flex items-center justify-between text-[11px] text-gray-500 pt-1 border-t border-gray-100">
+                <span><i class="fa-solid fa-users text-nyala-500"></i> إجمالي المتفاعلين: <strong>${totalReactions}</strong></span>
+                <button onclick="openCommentsModal('${postId}')" class="hover:text-nyala-600 font-bold"><i class="fa-solid fa-comment"></i> التعليقات والردود</button>
+              </div>
+
+              <!-- أزرار التفاعلات المطلوبة -->
+              <div class="grid grid-cols-5 gap-1 pt-1">
+                <button onclick="reactToPost('${postId}', 'like')" class="bg-gray-50 hover:bg-nyala-50 text-gray-600 text-[10px] py-1.5 rounded font-bold flex flex-col items-center">
+                  <i class="fa-solid fa-thumbs-up text-blue-500"></i> لايك (${reactions.like?.length || 0})
+                </button>
+                <button onclick="reactToPost('${postId}', 'love')" class="bg-gray-50 hover:bg-nyala-50 text-gray-600 text-[10px] py-1.5 rounded font-bold flex flex-col items-center">
+                  <i class="fa-solid fa-heart text-red-500"></i> أحببته (${reactions.love?.length || 0})
+                </button>
+                <button onclick="reactToPost('${postId}', 'angry')" class="bg-gray-50 hover:bg-nyala-50 text-gray-600 text-[10px] py-1.5 rounded font-bold flex flex-col items-center">
+                  <i class="fa-solid fa-face-angry text-amber-500"></i> اغضبني (${reactions.angry?.length || 0})
+                </button>
+                <button onclick="reactToPost('${postId}', 'support')" class="bg-gray-50 hover:bg-nyala-50 text-gray-600 text-[10px] py-1.5 rounded font-bold flex flex-col items-center">
+                  <i class="fa-solid fa-hand-holding-heart text-nyala-500"></i> أدعمه (${reactions.support?.length || 0})
+                </button>
+                <button onclick="reactToPost('${postId}', 'sad')" class="bg-gray-50 hover:bg-nyala-50 text-gray-600 text-[10px] py-1.5 rounded font-bold flex flex-col items-center">
+                  <i class="fa-solid fa-face-sad-tear text-indigo-500"></i> أحزنني (${reactions.sad?.length || 0})
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    // دالة تسجيل التفاعل (لايك، أحببته، اغضبني، أدعمه، أحزنني)
+    async function reactToPost(postId, reactionType) {
+      if (!currentUser) return alert('يجب تسجيل الدخول أولاً للتفاعل مع المنشورات');
+      
+      const postRef = db.collection('nyala_posts').doc(postId);
+      try {
+        await db.runTransaction(async (transaction) => {
+          const doc = await transaction.get(postRef);
+          if (!doc.exists) return;
+
+          let data = doc.data();
+          let reactions = data.reactions || { like: [], love: [], angry: [], support: [], sad: [] };
+
+          // إزالة التفاعل السابق لنفس المستخدم إن وجد في أي نوع تفاعل
+          Object.keys(reactions).forEach(type => {
+            if (reactions[type]) {
+              reactions[type] = reactions[type].filter(user => user !== currentUser.username);
+            }
+          });
+
+          // إضافة التفاعل الجديد
+          if (!reactions[reactionType]) reactions[reactionType] = [];
+          reactions[reactionType].push(currentUser.username);
+
+          transaction.update(postRef, { reactions: reactions });
+        });
+      } catch (e) {
+        alert('تعذّر تسجيل التفاعل: ' + e.message);
       }
     }
 
-    // Profile Save
-    function saveProfile(e) {
-      e.preventDefault();
-      alert('تم حفظ بيانات الملف الشخصي بنجاح!');
+    // --- إدارة التعليقات والردود عليها ---
+    function openCommentsModal(postId) {
+      activePostIdForComment = postId;
+      activeReplyingTo = null;
+      document.getElementById('commentsModal').classList.remove('hidden');
+      loadComments(postId);
+    }
+
+    function closeCommentsModal() {
+      document.getElementById('commentsModal').classList.add('hidden');
+      activePostIdForComment = null;
+      activeReplyingTo = null;
+    }
+
+    function loadComments(postId) {
+      const container = document.getElementById('commentsListContainer');
+      db.collection('nyala_posts').doc(postId).collection('comments').orderBy('createdAt', 'asc').onSnapshot(snapshot => {
+        container.innerHTML = '';
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">لا توجد تعليقات بعد. كن أول المعلقين!</p>';
+          return;
+        }
+        snapshot.forEach(doc => {
+          const comment = doc.data();
+          container.innerHTML += `
+            <div class="bg-gray-50 p-2.5 rounded-lg space-y-1 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-800">${comment.author}</span>
+                <span class="text-[9px] text-gray-400">${new Date(comment.createdAt).toLocaleTimeString()}</span>
+              </div>
+              <p class="text-gray-700">${comment.text}</p>
+              <button onclick="setReplyTarget('${comment.author}')" class="text-[10px] text-nyala-600 font-bold hover:underline"><i class="fa-solid fa-reply"></i> رد على ${comment.author}</button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function setReplyTarget(authorName) {
+      activeReplyingTo = authorName;
+      const input = document.getElementById('commentInputText');
+      input.placeholder = `الرد على ${authorName}...`;
+      input.focus();
+    }
+
+    async function sendComment() {
+      if (!currentUser) return alert('سجل الدخول أولاً للتعليق');
+      if (!activePostIdForComment) return;
+
+      const input = document.getElementById('commentInputText');
+      let text = input.value.trim();
+      if (!text) return;
+
+      if (activeReplyingTo) {
+        text = `@${activeReplyingTo} ${text}`;
+      }
+
+      const commentData = {
+        author: currentUser.username,
+        text: text,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        await db.collection('nyala_posts').doc(activePostIdForComment).collection('comments').add(commentData);
+        input.value = '';
+        activeReplyingTo = null;
+        input.placeholder = "اكتب تعليقاً...";
+      } catch (e) {
+        alert('خطأ في إرسال التعليق: ' + e.message);
+      }
+    }
+
+    // جلب كل المستخدمين الحقيقيين وعرضهم في قسم الاستكشف
+    function loadProfiles() {
+      const grid = document.getElementById('profilesGrid');
+      if (!grid) return;
+
+      db.collection('nyala_users').onSnapshot(snapshot => {
+        grid.innerHTML = '';
+        if (snapshot.empty) {
+          grid.innerHTML = '<p class="col-span-2 text-center text-xs text-gray-400 py-6">لا توجد حسابات مسجلة بعد. كن أول المسجلين في تطبيق نيالا!</p>';
+          return;
+        }
+        snapshot.forEach(doc => {
+          const user = doc.data();
+          grid.innerHTML += `
+            <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
+              <div class="relative h-36 bg-gradient-to-tr from-nyala-600 to-nyala-400 flex items-center justify-center text-white text-4xl font-bold">
+                ${user.username ? user.username.charAt(0).toUpperCase() : 'ن'}
+                <span class="absolute top-2 right-2 bg-green-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">متواجد</span>
+              </div>
+              <div class="p-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 class="font-bold text-gray-800 text-sm truncate">${user.username}</h3>
+                  <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid fa-location-dot text-nyala-500"></i> ${user.neighborhood || 'نيالا'}</p>
+                </div>
+                <button onclick="startChat('${user.username}')" class="mt-3 w-full bg-nyala-50 hover:bg-nyala-100 text-nyala-600 font-bold text-xs py-2 rounded-lg border border-nyala-100 transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-paper-plane"></i> مراسلة
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      }, error => {
+        console.error("Firestore Error: ", error);
+      });
+    }
+
+    function filterProfiles() {
+      const searchInput = document.getElementById('searchInput');
+      const query = searchInput ? searchInput.value.toLowerCase() : '';
+      const cards = document.querySelectorAll('#profilesGrid > div');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    // إدارة غرف البث المباشر
+    function openCreateLiveModal() {
+      if (!currentUser) return alert('يجب تسجيل الدخول أولاً لفتح بث مباشر');
+      const modal = document.getElementById('createLiveModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    async function createLiveStream() {
+      const titleInput = document.getElementById('liveTitleInput');
+      const title = titleInput ? titleInput.value.trim() : '';
+      if (!title) return alert('الرجاء إدخال عنوان البث');
+
+      try {
+        await db.collection('nyala_streams').add({
+          title: title,
+          host: currentUser.username,
+          neighborhood: currentUser.neighborhood,
+          time: new Date().toLocaleTimeString()
+        });
+        const modal = document.getElementById('createLiveModal');
+        if (modal) modal.classList.add('hidden');
+        if (titleInput) titleInput.value = '';
+        alert('تم فتح غرفة البث المباشر بنجاح!');
+      } catch(e) {
+        alert('تعذّر بدء البث: ' + e.message);
+      }
+    }
+
+    function loadLiveStreams() {
+      const grid = document.getElementById('liveStreamsGrid');
+      if (!grid) return;
+
+      db.collection('nyala_streams').onSnapshot(snapshot => {
+        grid.innerHTML = '';
+        if (snapshot.empty) {
+          grid.innerHTML = '<p class="text-center text-xs text-gray-400 py-6">لا توجد بثوث مباشرة نشطة حالياً في نيالا.</p>';
+          return;
+        }
+        snapshot.forEach(doc => {
+          const stream = doc.data();
+          grid.innerHTML += `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+              <div>
+                <span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">بث حي LIVE</span>
+                <h4 class="font-bold text-sm text-gray-800 mt-1">${stream.title}</h4>
+                <p class="text-xs text-gray-500">المضيف: <span class="font-semibold text-gray-700">${stream.host}</span> (${stream.neighborhood})</p>
+              </div>
+              <button onclick="alert('تم الانضمام إلى غرفة بث ${stream.host}')" class="bg-nyala-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow hover:bg-nyala-600">
+                انضمام
+              </button>
+            </div>
+          `;
+        });
+      });
+    }
+
+    // التطابق والدردشة المرئية
+    async function startVideoMatch() {
+      const matchBtn = document.getElementById('matchBtn');
+      const videoArea = document.getElementById('videoMatchArea');
+      if(matchBtn) {
+        matchBtn.innerText = "جاري البحث عن شخص للتطابق المرئي في نيالا...";
+        matchBtn.disabled = true;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const localVideo = document.getElementById('localVideo');
+        if(localVideo) localVideo.srcObject = stream;
+        if(videoArea) videoArea.classList.remove('hidden');
+        if(matchBtn) matchBtn.innerText = "تم التطابق بنجاح (البث المرئي نشط)";
+      } catch (err) {
+        alert('تعذر فتح الكاميرا أو الميكروفون. يرجى السماح بالأذونات من المتصفح.');
+        if(matchBtn) {
+          matchBtn.innerText = "أعد المحاولة";
+          matchBtn.disabled = false;
+        }
+      }
+    }
+
+    // مراسلة خاصة
+    function startChat(username) {
+      if (!currentUser) return alert('سجل الدخول أولاً للمراسلة');
+      const targetName = document.getElementById('chatTargetName');
+      const chatModal = document.getElementById('chatModal');
+      if(targetName) targetName.innerText = username;
+      if(chatModal) chatModal.classList.remove('hidden');
+    }
+    function closeChatModal() { 
+      const chatModal = document.getElementById('chatModal');
+      if(chatModal) chatModal.classList.add('hidden'); 
+    }
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      if (!input || !input.value.trim()) return;
+      const chatContainer = document.getElementById('chatMessages');
+      if(chatContainer) {
+        chatContainer.innerHTML += `<div class="flex justify-end"><div class="bg-nyala-500 text-white rounded-2xl px-4 py-2 text-sm max-w-[80%]">${input.value}</div></div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      input.value = '';
     }
   </script>
 </body>
